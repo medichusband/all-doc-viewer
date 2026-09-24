@@ -1,0 +1,1 @@
+{"name":"모든문서뷰어","short_name":"문서뷰어","description":"내 기기에서 바로 여는 브라우저 문서 뷰어","start_url":"/","display":"standalone","background_color":"#f4f6f8","theme_color":"#ffffff","icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]}

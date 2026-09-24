@@ -1,0 +1,3 @@
+import React,{useEffect,useRef,useState} from 'react'
+import {PPTXViewer} from 'pptx-viewer'
+export default function PptxFileViewer({file}){const hostRef=useRef(null),viewerRef=useRef(null);const[error,setError]=useState('');useEffect(()=>{let active=true;(async()=>{try{if(!hostRef.current)return;hostRef.current.innerHTML='';const viewer=new PPTXViewer(hostRef.current,{showControls:true,keyboardNavigation:true});viewerRef.current=viewer;await viewer.load(file)}catch(e){console.error(e);if(active)setError('PPTX 문서를 열지 못했어요.')}})();return()=>{active=false;try{viewerRef.current?.destroy?.()}catch{}viewerRef.current=null}},[file]);if(error)return <div className="viewer-error">{error}</div>;return <div ref={hostRef} className="pptx-host"/>}

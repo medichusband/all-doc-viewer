@@ -1,0 +1,8 @@
+import React,{useEffect,useRef,useState} from 'react'
+import * as pdfjsLib from 'pdfjs-dist'
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+pdfjsLib.GlobalWorkerOptions.workerSrc=pdfWorker
+export default function PdfViewer({file}){const canvasRef=useRef(null);const[doc,setDoc]=useState(null);const[page,setPage]=useState(1);const[scale,setScale]=useState(1.15);const[error,setError]=useState('');
+useEffect(()=>{let c=false;(async()=>{try{const b=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:b}).promise;if(!c){setDoc(pdf);setPage(1)}}catch{if(!c)setError('PDF를 열지 못했어요.')}})();return()=>{c=true}},[file]);
+useEffect(()=>{if(!doc||!canvasRef.current)return;let c=false;(async()=>{const p=await doc.getPage(page);const v=p.getViewport({scale});const canvas=canvasRef.current,ctx=canvas.getContext('2d'),r=window.devicePixelRatio||1;canvas.width=Math.floor(v.width*r);canvas.height=Math.floor(v.height*r);canvas.style.width=`${v.width}px`;canvas.style.height=`${v.height}px`;ctx.setTransform(r,0,0,r,0,0);if(!c)await p.render({canvasContext:ctx,viewport:v}).promise})();return()=>{c=true}},[doc,page,scale]);
+if(error)return <div className="viewer-error">{error}</div>;return <div className="viewer-shell"><div className="viewer-toolbar"><button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={!doc||page<=1}>이전</button><span>{doc?`${page} / ${doc.numPages}`:'불러오는 중'}</span><button onClick={()=>setPage(p=>Math.min(doc?.numPages||1,p+1))} disabled={!doc||page>=(doc?.numPages||1)}>다음</button><button onClick={()=>setScale(s=>Math.max(.6,s-.15))}>축소</button><button onClick={()=>setScale(s=>Math.min(2.5,s+.15))}>확대</button></div><div className="canvas-wrap"><canvas ref={canvasRef}/></div></div>}
